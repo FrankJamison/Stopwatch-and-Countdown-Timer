@@ -1,96 +1,112 @@
-# Stopwatch + Countdown (Product-Style UI)
+# Stopwatch and Countdown Timer
 
-A polished, single-page **Stopwatch + Countdown Timer** built with plain HTML/CSS/JavaScript.
+A polished single-page Stopwatch + Countdown Timer built with plain HTML/CSS/JavaScript.
 
-This project is designed to demonstrate **clean UI engineering**, **stateful JavaScript**, and **production-minded front-end details** (responsive layout, accessible controls, cache-busting during iteration, and maintainable structure) — without frameworks or a build step.
-
-## Why this matters (Employer/Recruiter view)
-
-- **Real UI work, not a demo snippet:** cohesive product-like layout with consistent components (cards, buttons, inputs, displays).
-- **Deliberate UX decisions:** predictable controls, clear validation feedback, and readable digital time presentation.
-- **Maintainable engineering:** stable element IDs for JS hooks, simple state model, and isolated styling.
-- **Practical constraints handled:** timing loops, tabular time output, and browser caching during rapid iteration.
+No dependencies, no build step—open it in a browser or serve it from any static web server.
 
 ## Features
 
 ### Stopwatch
 
 - Digital output formatted as `mm:ss:hh` (minutes : seconds : hundredths)
-- Start/Pause toggle + Clear
-- Analog face rendering:
-	- Watch-face PNG background
-	- Layered “hands” rotated via JavaScript
-	- Roles: black hand = seconds, red hand = milliseconds sweep, sub-dial hand = minutes
+- Start/Pause/Resume toggle + Clear
+- Analog face rendering (PNG face + layered hands rotated via JavaScript)
 
 ### Countdown
 
-- Input validation for exact `mm:ss:hh`
-- Start/Pause toggle
-- Clear/Reset button
-- Stops at `00:00:00` and shows “Time is up!”
+- Strict input validation for exact `mm:ss:hh`
+- Start/Pause/Resume toggle + Clear
+- Stops at `00:00:00` and displays “Time is up!”
+- Maximum start time: `10:00:00`
 
-## Design & UX notes
+## Tech (developer overview)
 
-- **Product-like layout:** two primary cards (Stopwatch + Countdown) with consistent headers, hints, and spacing.
-- **High contrast, dark-forward theme:** optimized for a modern “app” feel.
-- **Stable, readable time:** stopwatch uses a monospaced font to avoid digit width jitter.
-- **Clear error states:** countdown input shows immediate validation feedback.
-
-## Technical overview (Developer view)
-
-### Stack
-
-- HTML + CSS + Vanilla JavaScript
-- No dependencies, no bundler, no build pipeline
+- **HTML:** [index.html](index.html)
+- **CSS:** [css/myStyles.css](css/myStyles.css)
+- **JavaScript:** [js/myScript.js](js/myScript.js)
+- **Assets:** [images/](images/)
 
 ### Timebase and formatting
 
-- Internal unit: **hundredths of a second** (incremented every ~10ms)
-- Display format: `mm:ss:hh`
-- Formatting uses two-digit padding per segment.
+- Internal unit is **hundredths of a second** (the code increments every ~10ms)
+- Display format is `mm:ss:hh` (always 2 digits per segment)
 
 ### State model
 
-- Stopwatch state: `watchTime`, `watchIsRunning`
-- Countdown state: `timerTime`, `timerStartTime`, `timerIsRunning`
-- UI references cached once on load in a `ui` object.
+In [js/myScript.js](js/myScript.js), state is kept in a few globals:
 
-### Analog rendering
+- Stopwatch: `watchTime`, `watchIsRunning`
+- Countdown: `timerTime`, `timerStartTime`, `timerIsRunning`
 
-- Hands are positioned with CSS (absolute positioning + transform-origin at the pivot)
-- Rotation angles are applied by JS via `style.transform`
-- Hand pivots can be tuned via CSS variables (dial/sub-dial centers)
+DOM references are cached once on `window.onload` in a `ui` object.
 
-### Input validation (Countdown)
+### Analog stopwatch rendering
 
-- Strict regex validation for `mm:ss:hh`
-- Enforces a maximum of `10:00:00`
+The analog hands are positioned in CSS and rotated in `updateAnalogHands(time)` using `style.transform`.
 
 ## Project structure
 
 ```
 index.html
 README.md
-Pseudocode-NoDebugFinal.txt
 css/
 	myStyles.css
-js/
-	myScript.js
 images/
 	stopwatch.png
 	hand-minute.svg
 	hand-second-red.svg
+js/
+	myScript.js
 ```
 
 ## Run locally
 
-Option A — open directly:
+### Option A — open directly (simplest)
 
-1. Open `index.html` in a modern browser.
+Open [index.html](index.html) in a modern browser.
 
-Option B — use your local dev host:
+### Option B — run a tiny local server (recommended)
 
-- If you have this project mapped to a local host name (e.g., `http://2017stopwatchapplication.localhost/`), just open that URL.
+Serving from `http://localhost/...` avoids some browser quirks and makes refresh/testing more consistent.
+
+Pick one:
+
+- **Python 3** (from the repo root):
+  - `python -m http.server 8080`
+  - open `http://localhost:8080/`
+
+- **Node** (no install; uses `npx`):
+  - `npx --yes http-server -p 8080 .`
+  - open `http://localhost:8080/`
+
+- **VS Code extension:** use “Live Server” and open the served URL.
+
+### Option C — use the included VS Code task (workspace-specific)
+
+This workspace includes a VS Code task that opens Chrome to:
+
+`http://stopwatchandcountdowntimer.localhost/`
+
+Run it via **Terminal → Run Task… → Open in Browser** (or `Tasks: Run Task`).
+
+Notes:
+
+- The task is defined in [.vscode/tasks.json](.vscode/tasks.json).
+- This repo ignores `.vscode/` via [.gitignore](.gitignore), so you may need to recreate the task in your own workspace.
+- Many setups treat `*.localhost` as loopback; if your machine doesn’t resolve it, add a hosts entry (see next section).
+- If you prefer a different URL (like `http://localhost:8080/`), edit the task’s URL string.
+
+## Local host name setup (only if you want the `*.localhost` URL)
+
+If `http://stopwatchandcountdowntimer.localhost/` doesn’t resolve on your machine:
+
+1. Edit your hosts file (Windows):
+   - `C:\Windows\System32\drivers\etc\hosts`
+2. Add:
+   - `127.0.0.1 stopwatchandcountdowntimer.localhost`
+3. Serve this folder from a local web server and point that host name at the repo root.
+
+Because this is a static site, any web server works (IIS, Apache, nginx, etc.).
 
 ## How to use
 
@@ -102,22 +118,33 @@ Option B — use your local dev host:
 
 ### Countdown
 
-1. Enter a start time using `mm:ss:hh` (example: `01:30:00`).
+1. Enter a start time as `mm:ss:hh` (example: `01:30:00`).
 2. Press **Start**.
 3. Press **Pause** to pause.
-4. Press **Clear** to reset to `00:00:00`.
+4. Press **Clear** to reset.
+
+## Common dev tweaks
+
+### Cache-busting during iteration
+
+The CSS/JS includes a query string version in [index.html](index.html) (e.g. `myScript.js?v=...`).
+
+If you change assets and want to force a fresh load:
+
+- bump the `v=...` value in [index.html](index.html), or
+- hard refresh in the browser (`Ctrl+Shift+R`).
+
+### Countdown validation
+
+Countdown validation is strict by design:
+
+- Format must be exactly `mm:ss:hh`
+- Maximum allowed input is `10:00:00`
+
+If you want a different max, update the regex in `validateStartTime()` in [js/myScript.js](js/myScript.js).
 
 ## Troubleshooting
 
-- **Countdown won’t start:** ensure the input is exactly `mm:ss:hh` and not greater than `10:00:00`.
-- **Timing looks off in a background tab:** browsers can throttle timers in inactive tabs.
-- **Not seeing UI updates:** this project uses cache-busting query strings on CSS/JS during iteration; hard refresh (`Ctrl+Shift+R`) if needed.
-
-## Notes for extension
-
-Ideas that fit the current structure:
-
-- Keyboard shortcuts (start/pause/reset)
-- Presets for countdown (e.g., 00:30:00, 05:00:00)
-- Accessibility pass (announce state changes, improve focus order)
-- Higher-precision timekeeping (using `performance.now()` for drift correction)
+- **Countdown won’t start:** the input must match `mm:ss:hh` exactly and be `<= 10:00:00`.
+- **Timing looks off in background tabs:** browsers can throttle timers in inactive tabs.
+- **Changes not showing up:** hard refresh (`Ctrl+Shift+R`) or bump the query-string version in [index.html](index.html).
